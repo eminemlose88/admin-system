@@ -65,6 +65,18 @@ export const sb = {
     const r = await auth.delete(`/users/${id}`, { headers: headers() })
     return r.data
   },
+  findAdminByEmail: async (email) => {
+    const r = await rest.get('/admin_accounts', { params: { select: '*', email: `eq.${email}` }, headers: headers() })
+    return Array.isArray(r.data) ? r.data[0] : null
+  },
+  listAdminEmails: async () => {
+    const r = await rest.get('/admin_accounts', { params: { select: 'email' }, headers: headers() })
+    return (Array.isArray(r.data) ? r.data : []).map(x => x.email).filter(Boolean)
+  },
+  setAdminPasswordHash: async (id, password_hash) => {
+    const r = await rest.patch(`/admin_accounts?id=eq.${id}`, { password_hash }, { headers: headers() })
+    return r.data
+  },
   listAdminAccounts: async ({ limit = 50, offset = 0, query, role, status }) => {
     const params = { select: '*', order: 'created_at.desc', limit, offset }
     const filters = []

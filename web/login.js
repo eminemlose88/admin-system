@@ -1,7 +1,7 @@
 document.getElementById('login').addEventListener('click', async () => {
-  const username = document.getElementById('username').value
+  const email = document.getElementById('email').value
   const password = document.getElementById('password').value
-  const r = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) })
+  const r = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) })
   if (r.ok) {
     location.href = '/'
   } else {

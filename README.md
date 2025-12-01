@@ -63,12 +63,14 @@ npm run dev
 
 ### 管理员账号表
 - SQL 位于 `db/supabase_admin.sql`，在 Supabase SQL Editor 执行即可创建
-- 字段：`id`、`auth_user_id`、`email`、`name`、`role`（admin/superadmin/viewer）、`status`（active/disabled）、`ip_whitelist[]`、`mfa_enabled`、`last_login_at`、`created_at`、`updated_at`
+- 字段：`id`、`auth_user_id`、`email`、`name`、`password_hash`、`role`（admin/superadmin/viewer）、`status`（active/disabled）、`ip_whitelist[]`、`mfa_enabled`、`last_login_at`、`created_at`、`updated_at`
 - 接口：
   - `GET /api/admin-accounts?query&role&status`
   - `POST /api/admin-accounts`（JSON 负载）
   - `PATCH /api/admin-accounts/:id`
   - `DELETE /api/admin-accounts/:id`
+ - 登录：`POST /api/admin/login` 使用 `email + password` 验证；密码在后端以 `bcrypt` 哈希存储与校验
+ - 分离策略：普通用户存在于 Supabase `auth.users`，管理员存在于 `admin_accounts`，用户列表接口会自动排除 `admin_accounts` 的邮箱
 
 ## Supabase 管理接口
 

@@ -36,12 +36,21 @@ app.get('/', (req, res) => {
 })
 app.use(express.static(path.join(__dirname, '..', 'web')))
 
-app.post('/api/admin/login', (req, res) => {
-  const { username, password } = req.body || {}
-  const ok = username === (process.env.ADMIN_USERNAME || 'admin') && password === process.env.ADMIN_PASSWORD
-  if (!ok) return res.status(401).json({ error: 'invalid_credentials' })
-  issueAdminSession(res, { u: username })
-  res.json({ ok: true })
+import bcrypt from 'bcryptjs'
+
+app.post('/api/admin/login', async (req, res) => {
+  const { email, password } = req.body || {}
+  try {
+    const admin = await sb.findAdminByEmail(String(email))
+    if (!admin || admin.status === 'disabled') return res.status(401).json({ error: 'invalid_credentials' })
+    if (!admin.password_hash) return res.status(401).json({ error: 'password_not_set' })
+    const ok = await bcrypt.compare(String(password), admin.password_hash)
+    if (!ok) return res.status(401).json({ error: 'invalid_credentials' })
+    issueAdminSession(res, { u: admin.email, role: admin.role, id: admin.id })
+    res.json({ ok: true })
+  } catch (e) {
+    res.status(500).json({ error: 'admin_login_failed' })
+  }
 })
 
 app.get('/api/admin/me', requireAdmin, (req, res) => {
@@ -53,16 +62,15 @@ app.get('/api/accounts', requireAdmin, async (req, res) => {
   try {
     const per_page = Number(limit)
     const page = Math.max(1, Math.floor(Number(offset) / per_page) + 1)
-    const data = await sb.listAuthUsers({ page, per_page })
-    const users = Array.isArray(data?.users) ? data.users : (Array.isArray(data) ? data : [])
+    const [data, adminEmails] = await Promise.all([
+      sb.listAuthUsers({ page, per_page }),
+      sb.listAdminEmails()
+    ])
+    const usersAll = Array.isArray(data?.users) ? data.users : (Array.isArray(data) ? data : [])
     const q = String(query).toLowerCase().trim()
-    const filtered = q
-      ? users.filter(u => {
-          const email = (u.email || '').toLowerCase()
-          const name = (u.user_metadata?.name || '').toLowerCase()
-          return email.includes(q) || name.includes(q)
-        })
-      : users
+    const filtered = usersAll
+      .filter(u => !adminEmails.includes(u.email))
+      .filter(u => q ? ((u.email || '').toLowerCase().includes(q) || (u.user_metadata?.name || '').toLowerCase().includes(q)) : true)
     const rows = filtered.map(u => ({ id: u.id, email: u.email, name: u.user_metadata?.name || '', created_at: u.created_at }))
     res.json({ data: rows })
   } catch (e) {

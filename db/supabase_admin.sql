@@ -7,6 +7,7 @@ create table if not exists public.admin_accounts (
   auth_user_id uuid unique,
   email text not null unique,
   name text,
+  password_hash text,
   role text not null default 'admin', -- admin | superadmin | viewer
   status text not null default 'active', -- active | disabled
   ip_whitelist text[],
@@ -45,4 +46,3 @@ for select using (auth.role() = 'service_role');
 drop policy if exists admin_accounts_service_write on public.admin_accounts;
 create policy admin_accounts_service_write on public.admin_accounts
 for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
-
