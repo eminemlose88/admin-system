@@ -1,0 +1,15 @@
+{
+  "name": "noblesse-admin",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "redis:test": "node scripts/redis-test.mjs"
+  },
+  "dependencies": {
+    "redis": "^4.6.14",
+    "bcryptjs": "^2.4.3"
+  }
+}
+
