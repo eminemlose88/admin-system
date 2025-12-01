@@ -4,6 +4,7 @@
 
 - 查询账号与交易流水
 - 支付接口健康检查与实时监控（SSE）
+- 支付回调实时监控（SSE）
 - 接入 Cloudflare Zero Trust（Access JWT 校验）
 - IP 白名单限制
 
@@ -19,6 +20,9 @@
    - `PAYMENT_HEALTH_URL` 支付健康检查 URL
    - `SUPABASE_URL` 你的 Supabase 项目地址
    - `SUPABASE_SERVICE_KEY` Supabase 服务密钥（仅后端使用，不要提交）
+   - `ADMIN_USERNAME` / `ADMIN_PASSWORD` / `ADMIN_SECRET` 管理员登录与会话
+   - `VERCEL_BLOB_TOKEN` 用于管理存储在 Vercel Blob 的图片/视频
+   - `PAYMENT_CALLBACKS_URL` 支付回调状态数据源 URL
 
 2. 安装依赖并启动
 
@@ -61,3 +65,6 @@ npm run dev
 - 用户管理：后端代理至 `${SUPABASE_URL}/auth/v1/admin`，支持列表、创建与删除
 - `.env` 必须设置 `SUPABASE_SERVICE_KEY`；不要将密钥暴露到前端或提交到仓库
 
+- 登录：访问根路径，未登录则显示登录页，成功后进入侧边导航的管理面板
+- 客户端页面管理：调用后端代理的 Vercel Blob API 列表/上传/删除资源
+- 支付回调监控：SSE 轮询 `PAYMENT_CALLBACKS_URL` 并实时显示

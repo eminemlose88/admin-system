@@ -1,4 +1,13 @@
 const qs = p => new URLSearchParams(p).toString()
+const switchTab = id => {
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'))
+  const el = document.getElementById(id)
+  if (el) el.classList.add('active')
+}
+document.querySelectorAll('.sidebar button').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(`tab-${btn.dataset.tab}`))
+})
+switchTab('tab-users')
 
 const renderRows = (tbody, rows, cols) => {
   tbody.innerHTML = rows.map(r => `<tr>${cols.map(c => `<td>${r[c] ?? ''}</td>`).join('')}</tr>`).join('')
@@ -64,5 +73,42 @@ document.getElementById('createUser').addEventListener('click', async () => {
   const j = await r.json()
   if (j.data?.id) {
     document.getElementById('loadUsers').click()
+  }
+})
+
+document.getElementById('listAssets').addEventListener('click', async () => {
+  const prefix = document.getElementById('assetPrefix').value
+  const r = await fetch(`/api/assets/list?${qs({ prefix })}`)
+  const j = await r.json()
+  const tbody = document.getElementById('assetsBody')
+  const items = j.data?.blobs || j.data?.items || []
+  tbody.innerHTML = items.map(b => `<tr><td><a href="${b.url}" target="_blank">${b.url}</a></td><td>${b.size || ''}</td><td><button data-url="${b.url}" class="delAsset">删除</button></td></tr>`).join('')
+  tbody.querySelectorAll('.delAsset').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const url = btn.getAttribute('data-url')
+      await fetch(`/api/assets?${qs({ url })}`, { method: 'DELETE' })
+      btn.closest('tr').remove()
+    })
+  })
+})
+
+document.getElementById('uploadAsset').addEventListener('click', async () => {
+  const fileEl = document.getElementById('assetFile')
+  const filename = document.getElementById('assetFileName').value || (fileEl.files[0]?.name || '')
+  const contentType = document.getElementById('assetContentType').value || (fileEl.files[0]?.type || 'application/octet-stream')
+  const file = fileEl.files[0]
+  if (!file) return
+  const buf = await file.arrayBuffer()
+  const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)))
+  await fetch('/api/assets/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename, contentType, dataBase64: b64 }) })
+  document.getElementById('listAssets').click()
+})
+
+document.getElementById('startCallbacks').addEventListener('click', async () => {
+  const pre = document.getElementById('callbacks')
+  const es = new EventSource('/api/payment/callbacks/monitor')
+  es.onmessage = e => {
+    const d = JSON.parse(e.data)
+    pre.textContent = JSON.stringify(d, null, 2)
   }
 })

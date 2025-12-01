@@ -11,12 +11,20 @@
     <h1>网站后台管理</h1>
     <div id="status">支付接口状态: <span id="health">未知</span></div>
   </header>
-  <main>
-    <section>
-      <h2>账号查询</h2>
+  <div class="layout">
+    <nav class="sidebar">
+      <button data-tab="users">用户管理</button>
+      <button data-tab="bills">账单管理</button>
+      <button data-tab="client">客户端页面管理</button>
+      <button data-tab="payment">支付接口管理</button>
+    </nav>
+    <main class="content">
+    <section id="tab-users" class="tab">
+      <h2>用户管理</h2>
       <div class="controls">
         <input id="accountQuery" placeholder="搜索邮箱或姓名" />
         <button id="loadAccounts">查询</button>
+        <button id="loadUsers">加载所有用户</button>
       </div>
       <table>
         <thead>
@@ -27,8 +35,8 @@
         <tbody id="accountsBody"></tbody>
       </table>
     </section>
-    <section>
-      <h2>流水查询</h2>
+    <section id="tab-bills" class="tab">
+      <h2>账单管理</h2>
       <div class="controls">
         <input id="txAccountId" placeholder="账号ID" />
         <input id="txStatus" placeholder="状态" />
@@ -44,24 +52,34 @@
         <tbody id="txBody"></tbody>
       </table>
     </section>
-    <section>
-      <h2>Supabase 用户管理</h2>
+    <section id="tab-client" class="tab">
+      <h2>客户端页面管理</h2>
       <div class="controls">
-        <button id="loadUsers">加载用户</button>
-        <input id="newUserEmail" placeholder="邮箱" />
-        <input id="newUserPassword" placeholder="密码" type="password" />
-        <button id="createUser">创建用户</button>
+        <input id="assetPrefix" placeholder="前缀(可选)" />
+        <button id="listAssets">列出资源</button>
+      </div>
+      <div class="controls">
+        <input id="assetFileName" placeholder="文件名，如 banner.jpg" />
+        <input id="assetContentType" placeholder="类型，如 image/jpeg" />
+        <input id="assetFile" type="file" />
+        <button id="uploadAsset">上传</button>
       </div>
       <table>
         <thead>
-          <tr>
-            <th>ID</th><th>Email</th><th>姓名</th><th>创建时间</th><th>操作</th>
-          </tr>
+          <tr><th>URL</th><th>大小</th><th>操作</th></tr>
         </thead>
-        <tbody id="usersBody"></tbody>
+        <tbody id="assetsBody"></tbody>
       </table>
     </section>
-  </main>
+    <section id="tab-payment" class="tab">
+      <h2>支付接口管理</h2>
+      <div class="controls">
+        <button id="startCallbacks">监控支付回调</button>
+      </div>
+      <pre id="callbacks"></pre>
+    </section>
+    </main>
+  </div>
   <script src="/app.js"></script>
 </body>
 </html>
