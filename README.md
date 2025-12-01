@@ -38,7 +38,7 @@ npm run dev
     - `SUPABASE_URL`、`SUPABASE_SERVICE_KEY`
     - `CF_ACCESS_JWKS_URL`、`CF_ACCESS_AUD`、`CF_ACCESS_ISS`
     - `IP_WHITELIST`、`PAYMENT_HEALTH_URL`
-  - 选择 Node.js 运行时为 `nodejs22.x`；创建后自动构建并部署
+  - 选择 Node.js 运行时为 `nodejs20.x`；创建后自动构建并部署
   - 如需预览/生产环境，分别在 Vercel 中设置对应环境变量
 
 > 说明：Express 已通过 `serverless-http` 适配到 Vercel Serverless Functions（`api/index.js`）。
