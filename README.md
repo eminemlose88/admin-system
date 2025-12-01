@@ -29,6 +29,20 @@ npm run dev
 
 3. 浏览器访问 `http://localhost:8787`
 
+## Vercel 部署（关联 GitHub 仓库）
+
+- 已提供 `vercel.json`，将根路径映射到 `web/`，API 映射到 `/api`
+- 部署步骤：
+  - 在 Vercel 选择“Import Git Repository”，指向你的 GitHub 仓库 `admin-system`
+  - 在 Project Settings → Environment Variables 配置：
+    - `SUPABASE_URL`、`SUPABASE_SERVICE_KEY`
+    - `CF_ACCESS_JWKS_URL`、`CF_ACCESS_AUD`、`CF_ACCESS_ISS`
+    - `IP_WHITELIST`、`PAYMENT_HEALTH_URL`
+  - 选择 Node.js 运行时，默认即可；创建后自动构建并部署
+  - 如需预览/生产环境，分别在 Vercel 中设置对应环境变量
+
+> 说明：Express 已通过 `serverless-http` 适配到 Vercel Serverless Functions（`api/index.js`）。
+
 ## Cloudflare Access 说明
 
 - 在 Cloudflare Zero Trust 创建应用并开启 **One-time Access Links** 或指定身份提供商登录
