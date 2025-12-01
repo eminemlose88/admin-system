@@ -17,6 +17,12 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+app.use('/api', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store')
+  res.setHeader('Pragma', 'no-cache')
+  next()
+})
+
 app.use(ipWhitelistMiddleware)
 
 if (!(process.env.CF_ACCESS_DISABLE_LOCAL === 'true' && process.env.NODE_ENV !== 'production')) {

@@ -27,6 +27,7 @@ export const requireAdmin = (req, res, next) => {
 
 export const issueAdminSession = (res, payload) => {
   const token = jwt.sign(payload, secret, { expiresIn: '2h' })
-  const cookie = `admin_session=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax`
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : ''
+  const cookie = `admin_session=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax${secure}`
   res.setHeader('Set-Cookie', cookie)
 }

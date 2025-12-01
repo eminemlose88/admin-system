@@ -7,6 +7,7 @@
 - 支付回调实时监控（SSE）
 - 接入 Cloudflare Zero Trust（Access JWT 校验）
 - IP 白名单限制
+ - 前端不保存任何数据，所有数据均由后端 API 从数据库读取
 
 ## 快速开始
 
@@ -79,3 +80,7 @@ npm run dev
 - 登录：访问根路径，未登录则显示登录页，成功后进入侧边导航的管理面板
 - 客户端页面管理：调用后端代理的 Vercel Blob API 列表/上传/删除资源
 - 支付回调监控：SSE 轮询 `PAYMENT_CALLBACKS_URL` 并实时显示
+## 数据隐私与缓存
+- 前端不使用 `localStorage`/`sessionStorage`/IndexedDB
+- 后端对 `/api/*` 响应设置 `Cache-Control: no-store` 与 `Pragma: no-cache`
+- 管理员会话采用 HttpOnly Cookie，生产环境自动附加 `Secure`
