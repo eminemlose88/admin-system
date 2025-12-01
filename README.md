@@ -1,47 +1,49 @@
-# Noblesse Billing Admin
-
-独立的打赏/账单后台管理系统（可单独上传为新仓库并部署到新域名）。
+# 后台管理系统
 
 ## 功能
-- 总账汇总、按用户查询账单、订单确认到账
-- 通过 Redis 保存用户与账单关联
-- 管理操作使用 `ADMIN_API_KEY` 鉴权
 
-## 目录
-- `index.html` + `admin.js` 管理后台前端
-- `styles.css` UI 样式
-- `api/` Serverless API（Vercel 兼容）
-- `.env.example` 环境变量模板
+- 查询账号与交易流水
+- 支付接口健康检查与实时监控（SSE）
+- 接入 Cloudflare Zero Trust（Access JWT 校验）
+- IP 白名单限制
 
-## 环境变量
-- `REDIS_URL`：Redis 连接串（推荐 TLS/云端）
-- `ADMIN_API_KEY`：后台操作密钥
+## 快速开始
 
-示例（使用你提供的实例）：
-```
-REDIS_URL=rediss://default:ngWfbHbxkzHC71qTqGUMjYJF9GzdZHPE@redis-19016.c99.us-east-1-4.ec2.cloud.redislabs.com:19016
-ADMIN_API_KEY=change-this
-```
+1. 复制 `.env.example` 为 `.env` 并填写:
+   - `PORT` 服务端口
+   - `DB_PATH` SQLite 文件路径（演示用，可替换为你的真实库）
+   - `IP_WHITELIST` 允许访问的 IP 列表
+   - `CF_ACCESS_JWKS_URL` 一般为 `https://你的域名/cdn-cgi/access/certs`
+   - `CF_ACCESS_AUD` Cloudflare Access 应用 AUD 值
+   - `CF_ACCESS_ISS` 形如 `https://你的team名.cloudflareaccess.com`
+   - `PAYMENT_HEALTH_URL` 支付健康检查 URL
+   - `SUPABASE_URL` 你的 Supabase 项目地址
+   - `SUPABASE_SERVICE_KEY` Supabase 服务密钥（仅后端使用，不要提交）
 
-## 本地验证
-- 安装 Vercel CLI：`npm i -g vercel`
-- 进入本目录并链接：`vercel link`
-- 同步环境：`vercel env pull .env.local`
-- 本地运行（支持 API）：`vercel dev`
+2. 安装依赖并启动
 
-前端页面：`http://localhost:3000/` 访问管理台
-
-## 生产部署
-- 直接将本文件夹提交为新仓库
-- 在 Vercel 新建项目并设置 `REDIS_URL`、`ADMIN_API_KEY`
-- 部署后即可通过新域名访问
-
-## redis-cli 快速连接
-- 安装 Docker Desktop
-- 直接连到你的云 Redis：
-```
-# Windows PowerShell（建议）
-docker run --rm -it redis:7-alpine redis-cli -u "redis://default:ngWfbHbxkzHC71qTqGUMjYJF9GzdZHPE@redis-19016.c99.us-east-1-4.ec2.cloud.redislabs.com:19016"
+```bash
+npm install
+npm run dev
 ```
 
-> 如果实例要求 TLS，可将协议改为 `rediss://`。
+3. 浏览器访问 `http://localhost:8787`
+
+## Cloudflare Access 说明
+
+- 在 Cloudflare Zero Trust 创建应用并开启 **One-time Access Links** 或指定身份提供商登录
+- 将应用的 `AUD` 与团队 `ISS` 填入环境变量
+- 后端会校验请求头 `Cf-Access-Jwt-Assertion` 的 JWT
+
+## 替换为真实数据库
+
+- 已接入 Supabase，使用 PostgREST 访问 `accounts` 与 `transactions` 表
+- Supabase Auth 管理：提供用户列表、创建与删除接口（服务密钥权限）
+- 如需扩展表结构或字段，请在 Supabase 中创建对应表并调整查询参数
+
+## Supabase 管理接口
+
+- 表数据：后端代理至 `${SUPABASE_URL}/rest/v1`，支持查询与增删改
+- 用户管理：后端代理至 `${SUPABASE_URL}/auth/v1/admin`，支持列表、创建与删除
+- `.env` 必须设置 `SUPABASE_SERVICE_KEY`；不要将密钥暴露到前端或提交到仓库
+

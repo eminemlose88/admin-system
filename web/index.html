@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>后台管理系统</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>网站后台管理</h1>
+    <div id="status">支付接口状态: <span id="health">未知</span></div>
+  </header>
+  <main>
+    <section>
+      <h2>账号查询</h2>
+      <div class="controls">
+        <input id="accountQuery" placeholder="搜索邮箱或姓名" />
+        <button id="loadAccounts">查询</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>邮箱</th><th>姓名</th><th>创建时间</th>
+          </tr>
+        </thead>
+        <tbody id="accountsBody"></tbody>
+      </table>
+    </section>
+    <section>
+      <h2>流水查询</h2>
+      <div class="controls">
+        <input id="txAccountId" placeholder="账号ID" />
+        <input id="txStatus" placeholder="状态" />
+        <input id="txProvider" placeholder="支付渠道" />
+        <button id="loadTx">查询</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>账号ID</th><th>金额</th><th>币种</th><th>状态</th><th>渠道</th><th>外部ID</th><th>创建时间</th>
+          </tr>
+        </thead>
+        <tbody id="txBody"></tbody>
+      </table>
+    </section>
+    <section>
+      <h2>Supabase 用户管理</h2>
+      <div class="controls">
+        <button id="loadUsers">加载用户</button>
+        <input id="newUserEmail" placeholder="邮箱" />
+        <input id="newUserPassword" placeholder="密码" type="password" />
+        <button id="createUser">创建用户</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Email</th><th>姓名</th><th>创建时间</th><th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="usersBody"></tbody>
+      </table>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
