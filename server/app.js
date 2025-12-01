@@ -7,7 +7,7 @@ import { verifyAccessMiddleware } from './security/access.js'
 import { ipWhitelistMiddleware } from './security/ipWhitelist.js'
 import { requireAdmin, issueAdminSession } from './security/adminSession.js'
 import { sb } from './storage/supabase.js'
-import { blob } from '../server/assets/vercelBlob.js'
+import { blob } from './assets/vercelBlob.js'
 import axios from 'axios'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -175,6 +175,43 @@ app.delete('/api/assets', requireAdmin, async (req, res) => {
     res.json({ data })
   } catch (e) {
     res.status(500).json({ error: 'assets_remove_failed' })
+  }
+})
+
+app.get('/api/admin-accounts', requireAdmin, async (req, res) => {
+  const { limit = 50, offset = 0, query, role, status } = req.query
+  try {
+    const rows = await sb.listAdminAccounts({ limit: Number(limit), offset: Number(offset), query: query ? String(query) : undefined, role, status })
+    res.json({ data: rows })
+  } catch (e) {
+    res.status(500).json({ error: 'admin_accounts_query_failed' })
+  }
+})
+
+app.post('/api/admin-accounts', requireAdmin, async (req, res) => {
+  try {
+    const rows = await sb.createAdminAccount(req.body)
+    res.json({ data: rows })
+  } catch (e) {
+    res.status(500).json({ error: 'admin_account_create_failed' })
+  }
+})
+
+app.patch('/api/admin-accounts/:id', requireAdmin, async (req, res) => {
+  try {
+    const rows = await sb.updateAdminAccount(req.params.id, req.body)
+    res.json({ data: rows })
+  } catch (e) {
+    res.status(500).json({ error: 'admin_account_update_failed' })
+  }
+})
+
+app.delete('/api/admin-accounts/:id', requireAdmin, async (req, res) => {
+  try {
+    const rows = await sb.deleteAdminAccount(req.params.id)
+    res.json({ data: rows })
+  } catch (e) {
+    res.status(500).json({ error: 'admin_account_delete_failed' })
   }
 })
 

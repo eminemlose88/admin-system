@@ -103,6 +103,38 @@ document.getElementById('createUser').addEventListener('click', async () => {
   }
 })
 
+document.getElementById('loadAdminAccounts').addEventListener('click', async () => {
+  const q = document.getElementById('adminQuery').value
+  const r = await fetch(`/api/admin-accounts?${qs({ query: q })}`)
+  const j = await r.json()
+  const tbody = document.getElementById('adminAccountsBody')
+  const rows = (j.data || [])
+  tbody.innerHTML = rows.map(u => `<tr>
+    <td>${u.id}</td>
+    <td>${u.email || ''}</td>
+    <td><input value="${u.name || ''}" data-id="${u.id}" class="adminName" /></td>
+    <td><input value="${u.role || ''}" data-id="${u.id}" class="adminRole" /></td>
+    <td><input value="${u.status || ''}" data-id="${u.id}" class="adminStatus" /></td>
+    <td>${u.last_login_at || ''}</td>
+    <td><button data-id="${u.id}" class="saveAdmin">保存</button> <button data-id="${u.id}" class="delAdmin">删除</button></td>
+  </tr>`).join('')
+  tbody.querySelectorAll('.delAdmin').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id')
+      await fetch(`/api/admin-accounts/${id}`, { method: 'DELETE' })
+      btn.closest('tr').remove()
+    })
+  })
+  tbody.querySelectorAll('.saveAdmin').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id')
+      const name = tbody.querySelector(`input.adminName[data-id="${id}"]`).value
+      const role = tbody.querySelector(`input.adminRole[data-id="${id}"]`).value
+      const status = tbody.querySelector(`input.adminStatus[data-id="${id}"]`).value
+      await fetch(`/api/admin-accounts/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, role, status }) })
+    })
+  })
+})
 document.getElementById('listAssets').addEventListener('click', async () => {
   const prefix = document.getElementById('assetPrefix').value
   const r = await fetch(`/api/assets/list?${qs({ prefix })}`)

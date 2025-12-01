@@ -60,6 +60,15 @@ npm run dev
 - Supabase Auth 管理：提供用户列表、创建与删除接口（服务密钥权限）
 - 如需扩展表结构或字段，请在 Supabase 中创建对应表并调整查询参数
 
+### 管理员账号表
+- SQL 位于 `db/supabase_admin.sql`，在 Supabase SQL Editor 执行即可创建
+- 字段：`id`、`auth_user_id`、`email`、`name`、`role`（admin/superadmin/viewer）、`status`（active/disabled）、`ip_whitelist[]`、`mfa_enabled`、`last_login_at`、`created_at`、`updated_at`
+- 接口：
+  - `GET /api/admin-accounts?query&role&status`
+  - `POST /api/admin-accounts`（JSON 负载）
+  - `PATCH /api/admin-accounts/:id`
+  - `DELETE /api/admin-accounts/:id`
+
 ## Supabase 管理接口
 
 - 表数据：后端代理至 `${SUPABASE_URL}/rest/v1`，支持查询与增删改

@@ -64,5 +64,27 @@ export const sb = {
     if (!serviceKey) throw new Error('service_key_required')
     const r = await auth.delete(`/users/${id}`, { headers: headers() })
     return r.data
+  },
+  listAdminAccounts: async ({ limit = 50, offset = 0, query, role, status }) => {
+    const params = { select: '*', order: 'created_at.desc', limit, offset }
+    const filters = []
+    if (role) filters.push(`role.eq.${role}`)
+    if (status) filters.push(`status.eq.${status}`)
+    if (filters.length) params.and = `(${filters.join(',')})`
+    if (query) params.or = `email.ilike.*${query}*,name.ilike.*${query}*`
+    const r = await rest.get('/admin_accounts', { params, headers: headers() })
+    return r.data
+  },
+  createAdminAccount: async (payload) => {
+    const r = await rest.post('/admin_accounts', payload, { headers: headers() })
+    return r.data
+  },
+  updateAdminAccount: async (id, payload) => {
+    const r = await rest.patch(`/admin_accounts?id=eq.${id}`, payload, { headers: headers() })
+    return r.data
+  },
+  deleteAdminAccount: async (id) => {
+    const r = await rest.delete(`/admin_accounts?id=eq.${id}`, { headers: headers() })
+    return r.data
   }
 }
