@@ -1,27 +1,34 @@
 import axios from 'axios'
 
 const base = process.env.SUPABASE_URL
-const key = process.env.SUPABASE_SERVICE_KEY
+const serviceKey = process.env.SUPABASE_SERVICE_KEY
+const anonKey = process.env.SUPABASE_ANON_KEY
 
-const headers = {
-  apikey: key,
-  Authorization: `Bearer ${key}`,
-  'Content-Type': 'application/json'
+const chooseKey = () => serviceKey || anonKey
+const headers = () => {
+  const key = chooseKey()
+  return {
+    apikey: key,
+    Authorization: `Bearer ${key}`,
+    'Content-Type': 'application/json'
+  }
 }
 
-const rest = axios.create({ baseURL: `${base}/rest/v1`, headers })
-const auth = axios.create({ baseURL: `${base}/auth/v1/admin`, headers })
+const rest = axios.create({ baseURL: `${base}/rest/v1` })
+const auth = axios.create({ baseURL: `${base}/auth/v1/admin` })
 
 const ilike = s => `*${String(s).replace(/\*/g, '')}*`
 
 export const sb = {
   // 使用 Admin API 管理内置 Auth 用户
   listAuthUsers: async ({ page = 1, per_page = 50 }) => {
-    const r = await auth.get('/users', { params: { page, per_page } })
+    if (!serviceKey) throw new Error('service_key_required')
+    const r = await auth.get('/users', { params: { page, per_page }, headers: headers() })
     return r.data
   },
   updateAuthUser: async (id, payload) => {
-    const r = await auth.put(`/users/${id}`, payload)
+    if (!serviceKey) throw new Error('service_key_required')
+    const r = await auth.put(`/users/${id}`, payload, { headers: headers() })
     return r.data
   },
   getTransactions: async ({ limit, offset, accountId, status, provider, dateFrom, dateTo }) => {
@@ -33,27 +40,29 @@ export const sb = {
     if (dateFrom) filters.push(`created_at.gte.${dateFrom}`)
     if (dateTo) filters.push(`created_at.lte.${dateTo}`)
     if (filters.length) params.and = `(${filters.join(',')})`
-    const r = await rest.get('/transactions', { params })
+    const r = await rest.get('/transactions', { params, headers: headers() })
     return r.data
   },
   createAccount: async (payload) => {
-    const r = await rest.post('/accounts', payload)
+    const r = await rest.post('/accounts', payload, { headers: headers() })
     return r.data
   },
   updateAccount: async (id, payload) => {
-    const r = await rest.patch(`/accounts?id=eq.${id}`, payload)
+    const r = await rest.patch(`/accounts?id=eq.${id}`, payload, { headers: headers() })
     return r.data
   },
   deleteAccount: async (id) => {
-    const r = await rest.delete(`/accounts?id=eq.${id}`)
+    const r = await rest.delete(`/accounts?id=eq.${id}`, { headers: headers() })
     return r.data
   },
   createAuthUser: async ({ email, password, email_confirm = true, user_metadata }) => {
-    const r = await auth.post('/users', { email, password, email_confirm, user_metadata })
+    if (!serviceKey) throw new Error('service_key_required')
+    const r = await auth.post('/users', { email, password, email_confirm, user_metadata }, { headers: headers() })
     return r.data
   },
   deleteAuthUser: async (id) => {
-    const r = await auth.delete(`/users/${id}`)
+    if (!serviceKey) throw new Error('service_key_required')
+    const r = await auth.delete(`/users/${id}`, { headers: headers() })
     return r.data
   }
 }

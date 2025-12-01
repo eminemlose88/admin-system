@@ -18,8 +18,9 @@
    - `CF_ACCESS_AUD` Cloudflare Access 应用 AUD 值
    - `CF_ACCESS_ISS` 形如 `https://你的team名.cloudflareaccess.com`
    - `PAYMENT_HEALTH_URL` 支付健康检查 URL
-   - `SUPABASE_URL` 你的 Supabase 项目地址
-   - `SUPABASE_SERVICE_KEY` Supabase 服务密钥（仅后端使用，不要提交）
+- `SUPABASE_URL` 你的 Supabase 项目地址
+- `SUPABASE_SERVICE_KEY` Supabase 服务密钥（仅后端使用，不要提交）
+- `SUPABASE_ANON_KEY` Supabase 匿名密钥（如仅需读取公开表）
    - `ADMIN_USERNAME` / `ADMIN_PASSWORD` / `ADMIN_SECRET` 管理员登录与会话
    - `VERCEL_BLOB_TOKEN` 用于管理存储在 Vercel Blob 的图片/视频
    - `PAYMENT_CALLBACKS_URL` 支付回调状态数据源 URL
@@ -63,6 +64,7 @@ npm run dev
 
 - 表数据：后端代理至 `${SUPABASE_URL}/rest/v1`，支持查询与增删改
 - 用户管理：后端代理至 `${SUPABASE_URL}/auth/v1/admin`，支持列表、创建与删除
+- 注意：用户管理需要 `SUPABASE_SERVICE_KEY`（服务密钥）。若仅设置了 `SUPABASE_ANON_KEY`，用户管理接口不可用，但可读取开启策略的业务表。
 - `.env` 必须设置 `SUPABASE_SERVICE_KEY`；不要将密钥暴露到前端或提交到仓库
 
 - 登录：访问根路径，未登录则显示登录页，成功后进入侧边导航的管理面板

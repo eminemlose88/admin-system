@@ -8,6 +8,33 @@ document.querySelectorAll('.sidebar button').forEach(btn => {
   btn.addEventListener('click', () => switchTab(`tab-${btn.dataset.tab}`))
 })
 switchTab('tab-users')
+// 自动加载用户与账单数据
+const autoLoadUsers = async () => {
+  try {
+    const r = await fetch('/api/accounts?limit=100&offset=0')
+    const j = await r.json()
+    renderRows(document.getElementById('accountsBody'), j.data || [], ['id','email','name','created_at'])
+  } catch {}
+}
+const autoLoadBills = async () => {
+  try {
+    const r = await fetch('/api/transactions?limit=100&offset=0')
+    const j = await r.json()
+    renderRows(document.getElementById('txBody'), j.data || [], ['id','account_id','amount','currency','status','provider','external_id','created_at'])
+  } catch {}
+}
+autoLoadUsers()
+
+document.querySelector('[data-tab="users"]').addEventListener('click', autoLoadUsers)
+document.querySelector('[data-tab="bills"]').addEventListener('click', autoLoadBills)
+document.querySelector('[data-tab="payment"]').addEventListener('click', () => {
+  const pre = document.getElementById('callbacks')
+  const es = new EventSource('/api/payment/callbacks/monitor')
+  es.onmessage = e => {
+    const d = JSON.parse(e.data)
+    pre.textContent = JSON.stringify(d, null, 2)
+  }
+})
 
 const renderRows = (tbody, rows, cols) => {
   tbody.innerHTML = rows.map(r => `<tr>${cols.map(c => `<td>${r[c] ?? ''}</td>`).join('')}</tr>`).join('')
